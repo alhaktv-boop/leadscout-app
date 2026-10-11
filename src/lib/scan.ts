@@ -176,6 +176,12 @@ export async function scanProject(projectId: string) {
     // 9) تنظيف الذاكرة القديمة
     const cutoff = new Date(Date.now() - SEEN_RETENTION_DAYS * 86_400_000).toISOString();
     await admin.from("scanned_items").delete().eq("project_id", projectId).lt("seen_at", cutoff);
+    // Reddit: لا نحتفظ بنص المحتوى أكثر من 14 يومًا. نبقي الرابط والتقييم والحالة والمسودة فقط
+    await admin.from("leads")
+      .update({ title: null, body: null, author: null })
+      .eq("project_id", projectId)
+      .lt("reddit_created_at", cutoff)
+      .not("body", "is", null);
   } catch (e) {
     runError = (e as Error).message;
   }

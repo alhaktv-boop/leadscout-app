@@ -40,7 +40,8 @@ export default function PrivacyPage() {
           <strong>Lead data:</strong> public Reddit posts and comments found by your scans, with title,
           text, subreddit, the public Reddit username of the author, a link and the date. We also store the
           relevance score, intent label and explanation, the drafted reply with your edits, and the status
-          you set.
+          you set. The title, text and username of a Reddit item are erased 14 days after it was posted;
+          the link, score, your drafted reply and status remain.
         </li>
         <li>
           <strong>Billing data:</strong> payments are handled by Stripe. We store your Stripe customer ID,
