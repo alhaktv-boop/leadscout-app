@@ -17,7 +17,10 @@ export function ScanButton({ projectId }: { projectId: string }) {
     try {
       const res = await fetch(`/api/projects/${projectId}/scan`, { method: "POST" });
       const raw = await res.text();
-      let json: { error?: string; scored?: number; created?: number; fetched?: number } = {};
+      let json: {
+        error?: string; scored?: number; created?: number; fetched?: number;
+        candidates?: number; aiError?: string | null; skippedBy?: Record<string, number>;
+      } = {};
       try {
         json = JSON.parse(raw);
       } catch {
@@ -34,8 +37,11 @@ export function ScanButton({ projectId }: { projectId: string }) {
         setResult({ ok: false, text });
         toast.error(text);
       } else {
-        const text = `Fetched ${json.fetched ?? 0}, checked ${json.scored ?? 0} new items, found ${json.created ?? 0} leads`;
-        setResult({ ok: true, text });
+        const why = Object.entries(json.skippedBy ?? {}).map(([k, v]) => `${k}:${v}`).join(", ");
+        let text = `Fetched ${json.fetched ?? 0}, passed filter ${json.candidates ?? 0}, scored ${json.scored ?? 0}, found ${json.created ?? 0} leads`;
+        if (why) text += ` (filtered out: ${why})`;
+        if (json.aiError) text += ` | OpenAI error: ${json.aiError}`;
+        setResult({ ok: !json.aiError, text });
         toast.success(text);
       }
       router.refresh();

@@ -54,6 +54,9 @@ export async function scanProject(projectId: string) {
 
   const stats = { fetched: 0, skipped: 0, scored: 0, created: 0, promptTokens: 0, completionTokens: 0 };
   let runError: string | null = null;
+  let aiError: string | null = null; // أول خطأ من OpenAI، لتشخيص سبب غياب التقييم
+  let candidateCount = 0;
+  let skippedBy: Record<string, number> = {};
 
   try {
     // 1) الجلب من كل subreddit
@@ -81,11 +84,12 @@ export async function scanProject(projectId: string) {
     const fresh = all.filter((i) => !seen.has(i.redditId));
 
     // 3) فلترة مجانية قبل الذكاء الاصطناعي
-    const { kept } = prefilter(fresh, {
+    const { kept, skipped: skippedReasons } = prefilter(fresh, {
       keywords: project.keywords as string[],
       exclude_keywords: (project.exclude_keywords as string[] | null) ?? [],
     });
     stats.skipped = fresh.length - kept.length;
+    skippedBy = skippedReasons;
 
     // 4) السقف: المنشورات أولًا ثم الأحدث
     const candidates = kept
@@ -93,6 +97,7 @@ export async function scanProject(projectId: string) {
         a.kind === b.kind ? b.createdAt.getTime() - a.createdAt.getTime() : a.kind === "post" ? -1 : 1
       )
       .slice(0, MAX_ITEMS_PER_SCAN);
+    candidateCount = candidates.length;
 
     // 5) تقييم بالدفعات
     const scores = new Map<string, ScoreResult>();
@@ -106,6 +111,7 @@ export async function scanProject(projectId: string) {
           if (r) scores.set(item.redditId, r);
         });
       } catch (e) {
+        aiError ??= (e as Error).message;
         console.error("[ai score]", (e as Error).message); // لا نعلّم العناصر كمرئية، فتُعاد المحاولة لاحقًا
       }
     });
@@ -186,5 +192,5 @@ export async function scanProject(projectId: string) {
     }).eq("id", run.id);
   }
 
-  return { ...stats, error: runError };
+  return { ...stats, candidates: candidateCount, skippedBy, aiError, error: runError };
 }
