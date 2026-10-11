@@ -2,6 +2,7 @@
 // خط الأنابيب: Reddit → استبعاد المعروف → فلترة مجانية → تقييم دفعات → مسودات للناجحين فقط → حفظ
 import { createAdminClient } from "./supabase/admin";
 import { fetchPosts, fetchRecentComments, type RedditItem } from "./reddit";
+import { fetchHackerNews } from "./hn";
 import { prefilter } from "./filters";
 import { draftReply, scoreBatch, type ScoreResult } from "./ai";
 
@@ -57,14 +58,20 @@ export async function scanProject(projectId: string) {
   try {
     // 1) الجلب من كل subreddit
     const byId = new Map<string, RedditItem>();
-    for (const sub of project.subreddits as string[]) {
-      try {
-        const posts = await fetchPosts(sub, project.keywords as string[]);
-        const comments = await fetchRecentComments(sub);
-        for (const it of [...posts, ...comments]) byId.set(it.redditId, it);
-      } catch (e) {
-        console.error(`[scan] r/${sub}:`, (e as Error).message); // نكمل بباقي المجتمعات
+    const hasReddit = !!(process.env.REDDIT_CLIENT_ID && process.env.REDDIT_CLIENT_SECRET);
+    if (hasReddit) {
+      for (const sub of project.subreddits as string[]) {
+        try {
+          const posts = await fetchPosts(sub, project.keywords as string[]);
+          const comments = await fetchRecentComments(sub);
+          for (const it of [...posts, ...comments]) byId.set(it.redditId, it);
+        } catch (e) {
+          console.error(`[scan] r/${sub}:`, (e as Error).message); // نكمل بباقي المجتمعات
+        }
       }
+    } else {
+      // وضع الاختبار: لا مفاتيح Reddit بعد، نستخدم Hacker News لاختبار التقييم والمسودات
+      for (const it of await fetchHackerNews(project.keywords as string[])) byId.set(it.redditId, it);
     }
     const all = [...byId.values()];
     stats.fetched = all.length;
