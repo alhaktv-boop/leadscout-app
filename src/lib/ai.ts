@@ -36,10 +36,12 @@ Score each item from 0 to 100: how likely its author would genuinely benefit fro
 - 85-100: explicitly asks for a tool, service or recommendation the product fits, or says they are about to buy or switch
 - 65-84: describes a concrete, current problem the product solves and seems open to solutions
 - 40-64: loosely related, vague need, or no clear ask
-- 0-39: unrelated; venting with no ask; already solved or already chose a solution; giving advice rather than seeking it; jobs or hiring; memes or news; the author is promoting their own product or a competitor; asks for something the product cannot do
+- 0-39: articles, guides, tutorials, announcements, "Show HN" or launch posts where the author is explaining or promoting something rather than asking; unrelated; venting with no ask; already solved or already chose a solution; giving advice rather than seeking it; jobs or hiring; memes or news; the author is promoting their own product or a competitor; asks for something the product cannot do
 
 Rules:
 - Judge the author's need, not whether the text merely contains a keyword.
+- The author must be the one who has the problem or is looking for a solution. If the author is teaching, informing or selling, score below 40.
+- Use asking_recommendation only when the author explicitly asks a question or requests suggestions.
 - Be conservative: when unsure, score below 60.
 - reason: one short sentence (max 20 words) quoting or naming the evidence in the text.
 - intent: buying_intent, asking_recommendation, complaint or other.
@@ -56,6 +58,8 @@ Rules:
 - Never invent personal experiences, customer stories, credentials, statistics, features or links.
 - Do not claim to be a customer of the product. No pressure, no urgency.
 - Reply in the language of the original text.
+- Never compliment or restate what the author wrote. Do not assume the author is "exploring" or "planning" anything they did not say.
+- If the author is not asking for help or advice (for example an article or announcement), output exactly: SKIP
 - Output only the reply text. If no genuinely helpful reply is possible, output exactly: SKIP`;
 
 const label = (it: RedditItem) => (it.kind === "comment" ? "Thread" : "Title");
