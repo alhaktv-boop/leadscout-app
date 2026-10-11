@@ -1,251 +1,135 @@
-// src/app/page.tsx — Landing page
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Schibsted_Grotesk } from "next/font/google";
-import { createClient } from "@/lib/supabase/server";
-import { PLANS, type PlanKey } from "@/lib/plans";
-import { HeroCard } from "@/components/landing/hero-card";
 
 const font = Schibsted_Grotesk({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 
 export const metadata: Metadata = {
-  title: "LeadScout: find Reddit leads and draft the replies",
+  title: "LeadScout: Find High-Intent B2B Clients Automatically",
   description:
-    "LeadScout watches the subreddits you pick, finds people asking for what you sell, scores each lead, and drafts a reply you can edit and post.",
+    "LeadScout scans Reddit and global online communities to instantly find and organize decision-makers asking for your services.",
   openGraph: {
-    title: "LeadScout: find Reddit leads and draft the replies",
+    title: "LeadScout: Find High-Intent B2B Clients Automatically",
     description:
-      "Find the Reddit threads where people are already asking for what you sell, with a drafted reply for each.",
+      "Find the online threads where potential clients are already asking for your B2B services, complete with AI-drafted responses.",
     type: "website",
   },
 };
 
-// الألوان معرّفة هنا فقط، فلا تتأثر بثيم shadcn داخل لوحة التحكم
-const THEME = {
-  "--paper": "#F2F4F3",
-  "--ink": "#0E2430",
-  "--muted": "#4A5B63",
-  "--line": "#D3DAD9",
-  "--accent": "#3347E0",
-} as React.CSSProperties;
-
-const ctaCls =
-  "inline-flex h-11 items-center rounded-md bg-[var(--accent)] px-5 font-medium text-white hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]";
-const linkCls =
-  "underline decoration-[var(--line)] underline-offset-4 hover:decoration-[var(--ink)]";
-
 const STEPS = [
   {
-    title: "Describe what you sell",
-    body: "Add your product, the words people use when they have the problem, and up to 10 subreddits to watch.",
+    title: "Define Your Ideal Client & Keywords",
+    body: "Enter your product or service description, target keywords, and the online communities where your B2B buyers ask for recommendations.",
   },
   {
-    title: "LeadScout scans and scores",
-    body: "It reads new posts and recent comments that match, and scores each one from 0 to 100 on whether the author would benefit. Anything under your minimum is dropped.",
+    title: "AI Scans & Scores Buyer Intent",
+    body: "LeadScout scans discussions in real-time, scoring leads from 0 to 100 based on buyer intent, budget cues, and problem alignment.",
   },
   {
-    title: "Review, edit, copy",
-    body: "Every lead comes with a drafted reply. Edit it, copy it in one click, and post it yourself from your own account.",
+    title: "Review, Draft & Close Deals",
+    body: "Every qualified lead arrives with an AI-crafted, non-spammy initial response. Edit with one click and engage instantly.",
   },
-];
-
-const REPLY_RULES = [
-  "It answers the person's actual question first, with something useful they can act on.",
-  "It mentions your product at most once, and only when it genuinely fits.",
-  "If you give a brand name, the reply says you're affiliated with it.",
-  "It matches the language of the original post.",
-  "Nothing is ever posted for you. You read it, change it, and send it.",
 ];
 
 const FAQ = [
   {
-    q: "Does LeadScout post on Reddit for me?",
-    a: "No. It finds the thread and drafts a reply. You edit it and post it yourself, so every reply goes out under your name and your judgment.",
+    q: "How does LeadScout find B2B leads?",
+    a: "LeadScout continuously monitors subreddits and tech communities for buyer intent keywords. It filters out noise and highlights direct requests for your services.",
   },
   {
-    q: "How does it decide something is a lead?",
-    a: "It reads the post or comment next to your product description and scores from 0 to 100 how likely the author is to benefit from what you sell. Only results above your minimum score reach your inbox. The default minimum is 60, and you can change it per project.",
+    q: "Is it tailored for SaaS, Agencies, and Consultants?",
+    a: "Yes! LeadScout is purpose-built for B2B founders, agencies, freelancers, and consultants looking for high-ticket clients without cold calling.",
   },
   {
-    q: "What does it scan, and how often?",
-    a: "New posts that match your keywords and recent comments in the subreddits you chose. It runs automatically every day, and you can start a scan yourself at any time, up to once every 10 minutes.",
-  },
-  {
-    q: "Will my replies get removed or my account banned?",
-    a: "We can't promise that. Every subreddit sets its own rules on self-promotion. LeadScout writes replies that help first and disclose your affiliation, but read each community's rules before you post.",
-  },
-  {
-    q: "What do I get without a plan?",
-    a: "You can create an account and set up a project. A plan turns scanning on.",
-  },
-  {
-    q: "Can I cancel?",
-    a: "Yes. You can cancel or change your plan from the billing page whenever you like.",
+    q: "Does LeadScout automatically post replies on my behalf?",
+    a: "No. LeadScout generates high-converting draft responses for your review, allowing you to maintain complete control over your brand voice.",
   },
 ];
 
-export default async function LandingPage() {
-  // الصفحة العامة يجب أن تعمل حتى لو لم تُضبط متغيرات Supabase بعد
-  let user: { id: string } | null = null;
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
-  } catch {
-    user = null;
-  }
-  const ctaHref = user ? "/dashboard" : "/login";
-
+export default function LandingPage() {
   return (
-    <div
-      style={THEME}
-      className={`${font.className} min-h-screen bg-[var(--paper)] text-[var(--ink)] antialiased`}
-    >
-      <header className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-5">
-        <Link href="/" className="text-lg font-extrabold tracking-tight">LeadScout</Link>
-        <nav aria-label="Main" className="flex items-center gap-5 text-sm">
-          <a href="#how" className="hidden text-[var(--muted)] hover:text-[var(--ink)] sm:inline">How it works</a>
-          <a href="#pricing" className="hidden text-[var(--muted)] hover:text-[var(--ink)] sm:inline">Pricing</a>
-          <a href="#faq" className="hidden text-[var(--muted)] hover:text-[var(--ink)] sm:inline">FAQ</a>
-          <Link href={ctaHref} className="font-medium underline underline-offset-4">
-            {user ? "Open dashboard" : "Sign in"}
+    <div className={`${font.className} min-h-screen bg-[#faf8f5] text-slate-900 font-sans selection:bg-teal-100 selection:text-teal-900`}>
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 py-6 max-w-7xl mx-auto">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center text-white font-extrabold text-2xl shadow-md shadow-teal-600/20">
+            L
+          </div>
+          <span className="text-2xl font-black tracking-tight text-slate-900">LeadScout</span>
+        </div>
+        <nav className="flex items-center gap-6">
+          <Link href="/login" className="text-slate-600 hover:text-slate-900 font-semibold transition-colors">
+            Sign In
+          </Link>
+          <Link
+            href="/login"
+            className="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md shadow-teal-600/20 hover:shadow-lg hover:shadow-teal-600/30 transition-all"
+          >
+            Get Started Free
           </Link>
         </nav>
       </header>
 
-      <main>
-        {/* Hero */}
-        <section className="mx-auto grid max-w-5xl items-center gap-12 px-5 pb-20 pt-10 lg:grid-cols-[1fr_1.05fr] lg:pt-16">
-          <div>
-            <h1 className="max-w-xl text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-[3.4rem]">
-              Find the Reddit threads where people are already asking for what you sell
-            </h1>
-            <p className="mt-5 max-w-lg text-lg leading-relaxed text-[var(--muted)]">
-              LeadScout watches the subreddits you pick, scores every match, and drafts a helpful reply
-              for each lead. You edit it, copy it, and post it.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Link href={ctaHref} className={ctaCls}>
-                {user ? "Open dashboard" : "Create your account"}
-              </Link>
-              <a href="#pricing" className={`text-sm ${linkCls}`}>See pricing</a>
+      {/* Hero Section */}
+      <main className="max-w-5xl mx-auto text-center pt-16 pb-24 px-4">
+        <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-800 border border-teal-200/80 px-4 py-2 rounded-full text-sm font-bold mb-8 shadow-sm">
+          <span className="text-teal-600 font-extrabold">✦</span> Built for B2B Founders, Agencies & Freelancers
+        </div>
+
+        <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight leading-[1.1] mb-8">
+          Spend Less Time Chasing <br />
+          <span className="text-teal-600">More Time Closing</span>
+        </h1>
+
+        <p className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-12 leading-relaxed font-normal">
+          LeadScout instantly finds and organizes contact-ready B2B leads asking for your solutions, so you can focus on outreach and closing deals instead of manual research.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+          <Link
+            href="/login"
+            className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-lg px-9 py-4 rounded-xl transition-all shadow-xl shadow-teal-600/25 hover:shadow-2xl hover:shadow-teal-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-3"
+          >
+            Start Finding Leads <span className="text-xl">→</span>
+          </Link>
+          <Link
+            href="/login"
+            className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-bold text-lg px-8 py-4 rounded-xl transition-all shadow-sm hover:shadow"
+          >
+            Request a Demo
+          </Link>
+        </div>
+
+        {/* Steps Section */}
+        <div className="grid md:grid-cols-3 gap-8 text-left mt-24 border-t border-slate-200/80 pt-16">
+          {STEPS.map((step, idx) => (
+            <div key={idx} className="bg-white p-8 rounded-2xl border border-slate-200/70 shadow-sm hover:shadow-md transition-all">
+              <div className="w-10 h-10 bg-teal-50 text-teal-700 font-extrabold rounded-xl flex items-center justify-center mb-6 text-lg border border-teal-100">
+                0{idx + 1}
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
+              <p className="text-slate-600 leading-relaxed text-sm md:text-base">{step.body}</p>
             </div>
-            <p className="mt-4 text-sm text-[var(--muted)]">
-              Set up a project for free. Choose a plan when you're ready to scan.
-            </p>
-          </div>
-          <HeroCard />
-        </section>
+          ))}
+        </div>
 
-        {/* How it works */}
-        <section id="how" className="border-t border-[var(--line)]">
-          <div className="mx-auto max-w-5xl px-5 py-20">
-            <h2 className="max-w-lg text-3xl font-bold tracking-tight">From keywords to a reply you can send</h2>
-            <ol className="mt-10 grid gap-10 sm:grid-cols-3">
-              {STEPS.map((s, i) => (
-                <li key={s.title}>
-                  <p className="text-3xl font-extrabold text-[var(--accent)]" aria-hidden>{i + 1}</p>
-                  <h3 className="mt-2 text-lg font-semibold">{s.title}</h3>
-                  <p className="mt-2 leading-relaxed text-[var(--muted)]">{s.body}</p>
-                </li>
-              ))}
-            </ol>
+        {/* FAQ Section */}
+        <div className="mt-28 text-left max-w-3xl mx-auto border-t border-slate-200/80 pt-16">
+          <h2 className="text-3xl font-black text-slate-900 mb-10 text-center">Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            {FAQ.map((item, idx) => (
+              <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-200/70 shadow-sm">
+                <h4 className="text-lg font-bold text-slate-900 mb-2">{item.q}</h4>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed">{item.a}</p>
+              </div>
+            ))}
           </div>
-        </section>
-
-        {/* Replies */}
-        <section className="border-t border-[var(--line)]">
-          <div className="mx-auto grid max-w-5xl gap-10 px-5 py-20 md:grid-cols-[1fr_1.2fr]">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight">Replies that read like a person wrote them</h2>
-              <p className="mt-4 max-w-md leading-relaxed text-[var(--muted)]">
-                Reddit removes spam quickly. The drafts are written to help the thread first, so a mention
-                of your product feels earned.
-              </p>
-            </div>
-            <ul className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
-              {REPLY_RULES.map((r) => (
-                <li key={r} className="py-4 leading-relaxed">{r}</li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* Pricing */}
-        <section id="pricing" className="border-t border-[var(--line)]">
-          <div className="mx-auto max-w-5xl px-5 py-20">
-            <h2 className="text-3xl font-bold tracking-tight">Pricing</h2>
-            <p className="mt-3 max-w-lg text-[var(--muted)]">
-              Monthly plans. Set up a project for free, and a plan turns scanning on.
-            </p>
-
-            <div className="mt-10 grid divide-y divide-[var(--line)] rounded-lg border border-[var(--line)] bg-white sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-              {(Object.keys(PLANS) as PlanKey[]).map((key) => {
-                const plan = PLANS[key];
-                return (
-                  <div key={key} className="flex flex-col gap-4 p-6">
-                    <div>
-                      <h3 className="text-xl font-bold">{plan.name}</h3>
-                      <p className="text-sm text-[var(--muted)]">{plan.blurb}</p>
-                    </div>
-                    <p className="text-3xl font-extrabold tracking-tight">{plan.priceLabel}</p>
-                    <ul className="flex-1 space-y-2 text-sm">
-                      {plan.features.map((f) => <li key={f}>{f}</li>)}
-                    </ul>
-                    <Link href={ctaHref} className={`${ctaCls} justify-center`}>
-                      Choose {plan.name}
-                    </Link>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section id="faq" className="border-t border-[var(--line)]">
-          <div className="mx-auto max-w-3xl px-5 py-20">
-            <h2 className="text-3xl font-bold tracking-tight">Questions</h2>
-            <div className="mt-8 divide-y divide-[var(--line)] border-y border-[var(--line)]">
-              {FAQ.map((item) => (
-                <details key={item.q} className="group py-4">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]">
-                    {item.q}
-                    <span aria-hidden className="text-xl leading-none text-[var(--muted)]">
-                      <span className="group-open:hidden">+</span>
-                      <span className="hidden group-open:inline">−</span>
-                    </span>
-                  </summary>
-                  <p className="mt-3 max-w-2xl leading-relaxed text-[var(--muted)]">{item.a}</p>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA */}
-        <section className="border-t border-[var(--line)]">
-          <div className="mx-auto max-w-5xl px-5 py-20">
-            <h2 className="max-w-xl text-3xl font-bold tracking-tight">Start with one subreddit and a few keywords</h2>
-            <p className="mt-3 max-w-lg text-[var(--muted)]">
-              You'll see what a good lead looks like for your product within the first scan.
-            </p>
-            <Link href={ctaHref} className={`${ctaCls} mt-6`}>
-              {user ? "Open dashboard" : "Create your account"}
-            </Link>
-          </div>
-        </section>
+        </div>
       </main>
 
-      <footer className="border-t border-[var(--line)]">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-6 text-sm text-[var(--muted)]">
-          <p>LeadScout drafts replies; you review and post them. Not affiliated with Reddit.</p>
-          <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2">
-            <Link href="/terms" className={linkCls}>Terms</Link>
-            <Link href="/privacy" className={linkCls}>Privacy</Link>
-            <Link href={ctaHref} className={linkCls}>{user ? "Dashboard" : "Sign in"}</Link>
-          </nav>
-        </div>
+      {/* Footer */}
+      <footer className="border-t border-slate-200/80 bg-white py-10 text-center text-slate-500 text-sm">
+        <p>© {new Date().getFullYear()} LeadScout. Global B2B Lead Generation Platform.</p>
       </footer>
     </div>
   );
