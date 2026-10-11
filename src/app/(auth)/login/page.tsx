@@ -16,6 +16,12 @@ export default function LoginPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // الوجهة بعد الدخول (مثلاً صفحة الدفع). نقبل المسارات الداخلية فقط
+  function destination() {
+    const next = new URLSearchParams(window.location.search).get("next");
+    return next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -27,14 +33,14 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setError(error.message);
       else {
-        router.push("/dashboard");
+        router.push(destination());
         router.refresh();
       }
     } else {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) setError(error.message);
       else if (data.session) {
-        router.push("/dashboard");
+        router.push(destination());
         router.refresh();
       } else {
         setNotice("Check your inbox to confirm your email, then sign in.");
