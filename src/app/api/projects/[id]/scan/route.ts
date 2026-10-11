@@ -34,6 +34,12 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: "Scanned a few minutes ago. Try again in 10 minutes." }, { status: 429 });
   }
 
-  const result = await scanProject(id);
-  return NextResponse.json(result);
+  try {
+    const result = await scanProject(id);
+    return NextResponse.json(result);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("[scan route]", e);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
