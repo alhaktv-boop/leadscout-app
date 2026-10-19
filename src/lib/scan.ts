@@ -3,6 +3,7 @@
 import { createAdminClient } from "./supabase/admin";
 import { fetchPosts, fetchRecentComments, type RedditItem } from "./reddit";
 import { fetchHackerNews } from "./hn";
+import { fetchBluesky } from "./bsky";
 import { prefilter } from "./filters";
 import { draftReply, scoreBatch, type ScoreResult } from "./ai";
 
@@ -73,8 +74,10 @@ export async function scanProject(projectId: string) {
         }
       }
     } else {
-      // وضع الاختبار: لا مفاتيح Reddit بعد، نستخدم Hacker News لاختبار التقييم والمسودات
-      for (const it of await fetchHackerNews(project.keywords as string[])) byId.set(it.redditId, it);
+      // بدون مفاتيح Reddit: Bluesky (طلبات حقيقية من أشخاص) + Hacker News
+      const kws = project.keywords as string[];
+      for (const it of await fetchBluesky(kws)) byId.set(it.redditId, it);
+      for (const it of await fetchHackerNews(kws)) byId.set(it.redditId, it);
     }
     const all = [...byId.values()];
     stats.fetched = all.length;
