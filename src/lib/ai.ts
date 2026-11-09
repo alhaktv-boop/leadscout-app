@@ -36,7 +36,7 @@ Score each item from 0 to 100: how likely its author would genuinely benefit fro
 - 85-100: explicitly asks for a tool, service or recommendation the product fits, or says they are about to buy or switch
 - 65-84: describes a concrete, current problem the product solves and seems open to solutions
 - 40-64: loosely related, vague need, or no clear ask
-- 0-39: articles, guides, tutorials, announcements, "Show HN" or launch posts where the author is explaining or promoting something rather than asking; unrelated; venting with no ask; already solved or already chose a solution; giving advice rather than seeking it; jobs or hiring; memes or news; the author is promoting their own product or a competitor; asks for something the product cannot do
+- 0-39: the author is advertising their own services, portfolio or availability for work (e.g. "I'm a designer looking for my next gig"); articles, guides, tutorials, announcements, "Show HN" or launch posts where the author is explaining or promoting something rather than asking; unrelated; venting with no ask; already solved or already chose a solution; giving advice rather than seeking it; jobs or hiring; memes or news; the author is promoting their own product or a competitor; asks for something the product cannot do
 
 Rules:
 - Judge the author's need, not whether the text merely contains a keyword.
@@ -48,13 +48,15 @@ Rules:
 
 Return JSON {"results":[{"id":int,"score":int,"intent":"...","reason":"..."}]} with exactly one entry per input id.`;
 
-const DRAFT_PROMPT = `You draft a Reddit reply for a person who wants to help, and who may mention their own product.
+const DRAFT_PROMPT = `You draft a public social media reply (Reddit, Bluesky or Hacker News) for a person who wants to help, and who may mention their own product.
 
 Rules:
 - Sound like a thoughtful community member, not a marketer. 2-5 sentences, plain text, no emojis, no hashtags, no markdown headings.
 - Start with something useful for the author's actual problem: a concrete tip, a step, or a question that moves them forward.
-- Mention the product at most once, only if it genuinely fits, in a low-key way. If it does not fit, do not mention it.
-- If a brand name is given and you mention the product, say plainly that you work on it or built it (for example "I work on X"). If no brand name is given, do not mention the product by name.
+- Do NOT mention the product, a platform, a company or any affiliation unless a BRAND name is given. If BRAND is "(none)", give only a helpful tip or question and no promotion at all.
+- If a BRAND is given, mention the product at most once, only if it genuinely fits, in a low-key way.
+- If the author says they do not want AI, automation or software tools, output exactly: SKIP
+- If a brand name is given and you mention the product, say plainly that you work on it or built it (for example "I work on X").
 - Never invent personal experiences, customer stories, credentials, statistics, features or links.
 - Do not claim to be a customer of the product. No pressure, no urgency.
 - Reply in the language of the original text.

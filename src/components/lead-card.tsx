@@ -35,6 +35,10 @@ function scoreColor(s: number) {
   return "bg-slate-400";
 }
 
+const SOURCE_LABEL: Record<string, string> = { bluesky: "Bluesky", hackernews: "Hacker News" };
+const sourceLabel = (sub: string) => SOURCE_LABEL[sub] ?? `r/${sub}`;
+const isReddit = (sub: string) => !(sub in SOURCE_LABEL);
+
 function timeAgo(iso: string) {
   const mins = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
   if (mins < 60) return `${mins} min ago`;
@@ -98,7 +102,7 @@ export function LeadCard({ lead }: { lead: Lead }) {
       <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
         <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
           <p className="text-sm text-muted-foreground">
-            r/{lead.subreddit} · {lead.kind === "post" ? "Post" : "Comment"} by u/{lead.author ?? "unknown"} · {timeAgo(lead.reddit_created_at)}
+            {sourceLabel(lead.subreddit)} · {lead.kind === "post" ? "Post" : "Comment"} by {isReddit(lead.subreddit) ? "u/" : "@"}{lead.author ?? "unknown"} · {timeAgo(lead.reddit_created_at)}
           </p>
           <p className="text-sm font-medium">
             {lead.score}% match
@@ -136,7 +140,7 @@ export function LeadCard({ lead }: { lead: Lead }) {
             <label htmlFor={`draft-${lead.id}`} className="text-sm font-medium">Suggested reply</label>
             <Textarea id={`draft-${lead.id}`} rows={5} value={draft} onChange={(e) => setDraft(e.target.value)} />
             <p className="text-xs text-muted-foreground">
-              Edit it so it sounds like you before you post. Check the subreddit's rules on self-promotion.
+              Edit it so it sounds like you before you post. Check the platform's rules on self-promotion.
             </p>
           </div>
         ) : (
@@ -146,7 +150,7 @@ export function LeadCard({ lead }: { lead: Lead }) {
         <footer className="flex flex-wrap gap-2">
           {draft && <Button size="sm" onClick={copy}>Copy reply</Button>}
           <Button size="sm" variant="outline" asChild>
-            <a href={lead.permalink} target="_blank" rel="noopener noreferrer">Open on Reddit</a>
+            <a href={lead.permalink} target="_blank" rel="noopener noreferrer">{isReddit(lead.subreddit) ? "Open on Reddit" : `Open on ${sourceLabel(lead.subreddit)}`}</a>
           </Button>
           {status !== "replied" && (
             <Button size="sm" variant="ghost" onClick={() => setLeadStatus("replied")}>Mark as replied</Button>
