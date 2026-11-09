@@ -13,7 +13,7 @@ const font = Schibsted_Grotesk({ subsets: ["latin"], weight: ["400", "500", "600
 export const metadata: Metadata = {
   title: "LeadScout: Find High-Intent B2B Clients Automatically",
   description:
-    "LeadScout scans Reddit communities to find people asking for what you sell, scores every lead, and drafts a reply you can edit and post.",
+    "LeadScout scans public posts on Bluesky and Hacker News every day to find people asking for what you sell, scores every lead, and drafts a reply you can edit and post.",
   openGraph: {
     title: "LeadScout: Find High-Intent B2B Clients Automatically",
     description:
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 const STEPS = [
   {
     title: "Define your ideal client",
-    body: "Describe what you sell, add the keywords your buyers use, and pick the communities where they ask for recommendations.",
+    body: "Describe what you sell, add the keywords your buyers use, and LeadScout searches public posts on Bluesky and Hacker News for people asking for it.",
   },
   {
     title: "AI scans and scores intent",
@@ -47,7 +47,7 @@ const BENEFITS = [
 const FAQ = [
   {
     q: "How does LeadScout find leads?",
-    a: "It monitors the communities you choose for new posts and comments that match your keywords, scores each one against your product description, and keeps only the results above your minimum score.",
+    a: "It searches public Bluesky and Hacker News posts from the last 24 hours that match your keywords, scores each one against your product description, and keeps only the results above your minimum score.",
   },
   {
     q: "Who is it built for?",
@@ -59,7 +59,7 @@ const FAQ = [
   },
   {
     q: "Will my replies get removed or my account banned?",
-    a: "We can't promise that. Each community sets its own rules on self-promotion. LeadScout writes replies that help first and disclose your affiliation, but read each community's rules before you post.",
+    a: "We can't promise that. Each platform sets its own rules on self-promotion. LeadScout writes replies that help first and disclose your affiliation, but read the platform's rules before you post.",
   },
   {
     q: "What do I get without a plan?",
@@ -160,7 +160,7 @@ export default async function LandingPage() {
               </span>
             </h1>
             <p className="mx-auto mt-8 max-w-3xl text-lg leading-relaxed text-slate-600 sm:text-xl">
-              LeadScout watches the communities you choose, finds people asking for what you sell, scores every
+              LeadScout watches public posts on Bluesky and Hacker News, finds people asking for what you sell, scores every
               lead from 0 to 100, and drafts a helpful reply, so you spend your time closing instead of
               searching.
             </p>
@@ -340,7 +340,7 @@ export default async function LandingPage() {
         <section className="px-5 pb-24">
           <div className="mx-auto max-w-5xl rounded-3xl bg-slate-900 px-6 py-16 text-center shadow-2xl">
             <h2 className="mx-auto max-w-xl text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Start with one community and a few keywords
+              Start with a few keywords
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-slate-300">
               You'll see what a good lead looks like for your product within the first scan.
@@ -357,7 +357,7 @@ export default async function LandingPage() {
 
       <footer className="border-t border-slate-200/80 bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm text-slate-500">
-          <p>© {new Date().getFullYear()} LeadScout. Drafts replies; you review and post them. Not affiliated with Reddit.</p>
+          <p>© {new Date().getFullYear()} LeadScout. Drafts replies; you review and post them. Sources: public posts on Bluesky and Hacker News. Reddit support is coming.</p>
           <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2 font-semibold">
             <Link href="/terms" className="hover:text-slate-900">Terms</Link>
             <Link href="/privacy" className="hover:text-slate-900">Privacy</Link>
