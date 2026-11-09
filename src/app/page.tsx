@@ -22,6 +22,12 @@ export const metadata: Metadata = {
   },
 };
 
+const REAL_LEADS = [
+  { src: "Bluesky", text: "I need to make a website!!!", match: 90, ago: "3 h ago" },
+  { src: "Bluesky", text: "I need to build a website for my new private practice. It has been ~30 years since I built a website from scratch.", match: 85, ago: "3 h ago" },
+  { src: "Bluesky", text: "We need to make a website", match: 85, ago: "6 h ago" },
+];
+
 const STEPS = [
   {
     title: "Define your ideal client",
@@ -187,6 +193,35 @@ export default async function LandingPage() {
         {/* Product preview */}
         <section className="mx-auto max-w-6xl px-5 pb-24">
           <HeroCard />
+        </section>
+
+        {/* Real examples */}
+        <section className="border-t border-slate-200/80">
+          <div className="mx-auto max-w-4xl px-5 py-20">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-sm font-bold uppercase tracking-widest text-teal-700">Real results</p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+                Found in one scan for a web-design service
+              </h2>
+              <p className="mt-3 text-slate-600">
+                Real public posts LeadScout found on Bluesky in a single run, with names removed. People asking for a website, hours before anyone else answered.
+              </p>
+            </div>
+            <ul className="mt-10 flex flex-col gap-4">
+              {REAL_LEADS.map((l) => (
+                <li key={l.text} className="flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                  <div className="w-1.5 shrink-0 bg-emerald-600" aria-hidden />
+                  <div className="min-w-0 flex-1 p-5">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm text-slate-500">
+                      <span>{l.src} · {l.ago}</span>
+                      <span className="font-semibold text-slate-800">{l.match}% match</span>
+                    </div>
+                    <p className="mt-2 break-words text-slate-900">&ldquo;{l.text}&rdquo;</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </section>
 
         {/* How it works */}
